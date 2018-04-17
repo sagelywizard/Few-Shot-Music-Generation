@@ -50,6 +50,9 @@ class MIDILoader(Loader):
     def is_song(self, filepath):
         return filepath.endswith('.mid')
 
+    def get_num_tokens(self):
+        return 16 * 128 * 2 + 32 * 16 + 100
+
     def tokenize(self, midi):
         """Turns a MIDI file into a list of event IDs.
 
