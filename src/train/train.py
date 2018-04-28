@@ -44,8 +44,10 @@ args = parser.parse_args()
 config = yaml.load(open(args.data, 'r'))
 config.update(yaml.load(open(args.task, 'r')))
 config.update(yaml.load(open(args.model, 'r')))
+config['dataset_path'] = os.path.abspath(config['dataset_path'])
 print('Config:')
-print(PP.format(config))
+print(PP.pformat(config))
+
 
 episode_sampler = {}
 for split in config['splits']:
