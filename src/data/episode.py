@@ -24,6 +24,7 @@ class SQSampler(object):
     Arguments:
         support_size (int): number of songs in the support set
         query_size (int): number of songs in the query set
+        random (RandomState): random generator to use
     """
     def __init__(self, support_size, query_size, random):
         self.support_size = support_size

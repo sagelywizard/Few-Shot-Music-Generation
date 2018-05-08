@@ -2,7 +2,7 @@ import os
 import tensorflow as tf
 import pprint
 
-from models.abstract_model import AbstractModel
+from models.abstract_model import BaseModel
 
 PP = pprint.PrettyPrinter(depth=6)
 
@@ -25,13 +25,14 @@ def init_vars_op(sess):
     return tf.variables_initializer(uninit_variables)
 
 
-def optimistic_restore(session, save_file, trainable_vars):
+def optimistic_restore(session, save_file, only_load_trainable_vars=False,
+                       stat_name_prefix='moving_'):
     """Restore variables of model from save_file.
 
     Argument trainable_vars is used to determine whether to fetch model
     variables & batch-norm statistics OR whether to fetch ALL variables
-    (includes model variables, batch-norm statistics, statistic variables ~
-    such as global step and learning rate decay.
+    (includes model variables, batch-norm statistics, training variables ~
+    such as global step and learning rate decay).
 
     Args:
         session: tf.Session to use in recovery
@@ -40,11 +41,9 @@ def optimistic_restore(session, save_file, trainable_vars):
             variables and running batch-norm statistics) or not (all variables
             including global step)
     """
-    BN_moving_stats_prefix = 'moving_'
-
     reader = tf.train.NewCheckpointReader(save_file)
     saved_shapes = reader.get_variable_to_shape_map()
-    if trainable_vars:
+    if only_load_trainable_vars:
         var_names = sorted([(var.name, var.name.split(':')[0])
                             for var in tf.trainable_variables()
                             if var.name.split(':')[0] in saved_shapes])
@@ -52,7 +51,7 @@ def optimistic_restore(session, save_file, trainable_vars):
                                      for var in tf.global_variables()
                                      if (var.name.split(':')[0]
                                          in saved_shapes and
-                                         BN_moving_stats_prefix in var.name)])
+                                         stat_name_prefix in var.name)])
         var_names += running_stat_names
     else:
         var_names = sorted([(var.name, var.name.split(':')[0])
@@ -76,7 +75,7 @@ def optimistic_restore(session, save_file, trainable_vars):
     saver.restore(session, save_file)
 
 
-class TFModel(AbstractModel):
+class TFModel(BaseModel):
 
     def __init__(self, config):
         tf.set_random_seed(config['seed'])
@@ -120,6 +119,6 @@ class TFModel(AbstractModel):
         optimistic_restore(self._sess, latest_checkpt, trainable_vars)
         return True
 
-    def recover_or_init(self, checkpt_path, trainable_vars=False):
-        self._recover(checkpt_path, trainable_vars)
+    def recover_or_init(self, checkpt_path, only_load_trainable_vars=False):
+        self._recover(checkpt_path, only_load_trainable_vars)
         self._sess.run(init_vars_op(self._sess))

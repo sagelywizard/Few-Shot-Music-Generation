@@ -1,7 +1,7 @@
 import numpy as np
 
 
-class AbstractModel(object):
+class BaseModel(object):
 
     def __init__(self, config):
         self._config = config
@@ -54,19 +54,25 @@ class AbstractModel(object):
         raise NotImplementedError()
 
 
-def flatten(set_):
+def flatten_first_two_dims(token_array):
     """Convert shape from [B,S,N] => [BxS,N]."""
-    shape = set_.shape
-    return np.reshape(set_, (shape[0] * shape[1], shape[2]))
+    shape = token_array.shape
+    return np.reshape(token_array, (shape[0] * shape[1], shape[2]))
 
 
-def convert_set_to_input_and_target(set_, start_word=None):
-    """Convert _set to input and target to use for model for sequence generation.
+def convert_tokens_to_input_and_target(token_array, start_word=None):
+    """Convert token_array to input and target to use for model for
+    sequence generation.
 
-    If start_word is given, add to start of _set.
-    Input is _set without last item; Target is _set without first item
+    If start_word is given, add to start of each sequence of tokens.
+    Input is token_array without last item; Target is token_array without first item.
+
+    Arguments:
+        token_array (numpy int array): tokens array of size [B,S,N] where
+            B is batch_size, S is number of songs, N is size of the song
+        start_word (int): token to use for start word
     """
-    X = flatten(set_)
+    X = flatten_first_two_dims(token_array)
 
     if start_word is None:
         Y = np.copy(X[:, 1:])

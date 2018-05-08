@@ -51,6 +51,12 @@ class MIDILoader(Loader):
         return filepath.endswith('.mid')
 
     def get_num_tokens(self):
+        """Get total number of possible MIDI tokens.
+
+        These are: 128 on/off notes for each of 16 instruments,
+        32 velocity buckets for each of 16 instruments,
+        and 100 for different time-shifts.
+        """
         return 16 * 128 * 2 + 32 * 16 + 100
 
     def tokenize(self, midi):

@@ -2,7 +2,7 @@ import numpy as np
 import tensorflow as tf
 
 from models.tf_model import TFModel
-from models.abstract_model import convert_set_to_input_and_target
+from models.base_model import convert_tokens_to_input_and_target
 
 
 class LSTMBaseline(TFModel):
@@ -17,8 +17,8 @@ class LSTMBaseline(TFModel):
 
     def _define_placedholders(self):
         # Add start word that starts every song
-        self._input_size = self._config['input_size'] + 1
         self._start_word = self._config['input_size']
+        self._input_size = self._config['input_size'] + 1
 
         self._time_steps = self._config['max_len']
         self._embd_size = self._config['embedding_size']
@@ -36,7 +36,7 @@ class LSTMBaseline(TFModel):
 
     def _build_graph(self):
         embedding = tf.get_variable(
-            "embedding", [self._input_size, self._embd_size],
+            'embedding', [self._input_size, self._embd_size],
             initializer=tf.truncated_normal_initializer(1., 1.))
         inputs = tf.nn.embedding_lookup(embedding, self._words)
         inputs = tf.unstack(inputs, axis=1)
@@ -58,8 +58,8 @@ class LSTMBaseline(TFModel):
         self._output = output
 
         softmax_w = tf.get_variable(
-            "softmax_w", [self._hidden_size, self._input_size])
-        softmax_b = tf.get_variable("softmax_b", [self._input_size])
+            'softmax_w', [self._hidden_size, self._input_size])
+        softmax_b = tf.get_variable('softmax_b', [self._input_size])
         logits = tf.nn.xw_plus_b(output, softmax_w, softmax_b)
         # Reshape logits to be a 3-D tensor for sequence loss
         logits = tf.reshape(
@@ -88,9 +88,9 @@ class LSTMBaseline(TFModel):
 
     def train(self, episode):
         """Concatenate query and support sets to train."""
-        X, Y = convert_set_to_input_and_target(
+        X, Y = convert_tokens_to_input_and_target(
             episode.support, self._start_word)
-        X2, Y2 = convert_set_to_input_and_target(
+        X2, Y2 = convert_tokens_to_input_and_target(
             episode.query, self._start_word)
         X = np.concatenate([X, X2])
         Y = np.concatenate([Y, Y2])
@@ -109,7 +109,7 @@ class LSTMBaseline(TFModel):
     def eval(self, episode):
         """Ignore support set and evaluate only on query set."""
         query_set = episode.query
-        X, Y = convert_set_to_input_and_target(query_set, self._start_word)
+        X, Y = convert_tokens_to_input_and_target(query_set, self._start_word)
 
         feed_dict = {}
         feed_dict[self._words] = X

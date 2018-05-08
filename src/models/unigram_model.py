@@ -2,7 +2,7 @@ import numpy as np
 import tensorflow as tf
 
 from models.tf_model import TFModel
-from models.abstract_model import convert_set_to_input_and_target
+from models.base_model import convert_tokens_to_input_and_target
 
 
 class UnigramModel(TFModel):
@@ -25,24 +25,24 @@ class UnigramModel(TFModel):
 
     def _build_graph(self):
         word_count = tf.get_variable(
-            "word_count", [self._input_size],
+            'word_count', [self._input_size],
             initializer=tf.constant_initializer(self._alpha),
             trainable=False)
         flatten_words = tf.reshape(self._words, [-1])
-        ones = tf.zeros_like(flatten_words, dtype=tf.float32) + 1
+        ones = tf.ones_like(flatten_words, dtype=tf.float32)
         self._train_op = tf.scatter_add(word_count, flatten_words, ones)
 
-        sum = tf.reduce_sum(word_count)
-        self._prob = tf.gather(word_count, flatten_words) / sum
+        sum_ = tf.reduce_sum(word_count)
+        self._prob = tf.gather(word_count, flatten_words) / sum_
         self._avg_neg_log = -tf.reduce_mean(tf.log(self._prob))
 
-        self._prob_all = word_count / tf.reduce_sum(word_count)
+        self._prob_all = word_count / sum_
 
     def train(self, episode):
         """Concatenate query and support sets to train."""
-        X, Y = convert_set_to_input_and_target(
+        X, Y = convert_tokens_to_input_and_target(
             episode.support)
-        X2, Y2 = convert_set_to_input_and_target(
+        X2, Y2 = convert_tokens_to_input_and_target(
             episode.query)
         X = np.concatenate([X, X2])
 
@@ -57,7 +57,7 @@ class UnigramModel(TFModel):
     def eval(self, episode):
         """Ignore support set and evaluate only on query set."""
         query_set = episode.query
-        X, Y = convert_set_to_input_and_target(query_set)
+        X, Y = convert_tokens_to_input_and_target(query_set)
 
         feed_dict = {}
         feed_dict[self._words] = Y

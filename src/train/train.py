@@ -70,7 +70,7 @@ model.recover_or_init(args.init_dir)
 
 # Train model and evaluate
 avg_nll = evaluate(model, episode_sampler['val'], n_val)
-print("Iter: %d, val-nll: %.3f" % (0, avg_nll))
+print("Iter: %d, val-nll: %.3e" % (0, avg_nll))
 
 
 avg_loss = 0.
@@ -81,19 +81,19 @@ for i in range(1, n_train + 1):
 
     if i % val_every_n == 0:
         avg_nll = evaluate(model, episode_sampler['val'], n_val)
-        print("Iter: %d, val-nll: %.3f" % (i, avg_nll))
+        print("Iter: %d, val-nll: %.3e" % (i, avg_nll))
 
         if args.checkpt_dir != '':
             model.save(args.checkpt_dir)
 
     if i % print_every_n == 0:
-        print("Iter: %d, loss: %.3f" % (i, avg_loss / print_every_n))
+        print("Iter: %d, loss: %.3e" % (i, avg_loss / print_every_n))
         avg_loss = 0.
 
 avg_nll = evaluate(model, episode_sampler['val'], n_val)
-print("Validation Avg NLL: %.3f" % (avg_nll))
+print("Validation Avg NLL: %.3e" % (avg_nll))
 avg_nll = evaluate(model, episode_sampler['test'], n_val)
-print("Test Avg NLL: %.3f" % (avg_nll))
+print("Test Avg NLL: %.3e" % (avg_nll))
 
 # Generate samples from trained model for test episodes
 samples_dir = os.path.join(args.checkpt_dir, 'samples')
@@ -110,7 +110,7 @@ for i in range(n_samples):
 
     for j in range(support_set.shape[0]):
         write_seq(episode_sampler['test'].detokenize(support_set[j]),
-                  curr_sample_dir, 'suport_%d' % j)
+                  curr_sample_dir, 'support_%d' % j)
 
     write_seq(episode_sampler['test'].detokenize(sample), curr_sample_dir,
               'model_sample')
