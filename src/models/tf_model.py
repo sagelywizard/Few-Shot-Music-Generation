@@ -2,7 +2,7 @@ import os
 import tensorflow as tf
 import pprint
 
-from models.abstract_model import BaseModel
+from models.base_model import BaseModel
 
 PP = pprint.PrettyPrinter(depth=6)
 
