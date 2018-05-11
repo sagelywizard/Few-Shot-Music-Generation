@@ -9,7 +9,7 @@ from operator import itemgetter
 
 import pretty_midi
 
-from base_loader import Loader
+from data.base_loader import Loader
 
 _SUSTAIN_ON = 0
 _SUSTAIN_OFF = 1

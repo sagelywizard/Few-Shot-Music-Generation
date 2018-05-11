@@ -8,7 +8,7 @@ import codecs
 import nltk
 import numpy as np
 
-from base_loader import Loader
+from data.base_loader import Loader
 
 
 log = logging.getLogger("few-shot")

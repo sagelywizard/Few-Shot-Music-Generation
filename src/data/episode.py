@@ -7,9 +7,9 @@ import yaml
 import numpy as np
 from numpy.random import RandomState
 
-from midi_loader import MIDILoader
-from lyrics_loader import LyricsLoader
-from dataset import Dataset, Metadata
+from data.midi_loader import MIDILoader
+from data.lyrics_loader import LyricsLoader
+from data.dataset import Dataset, Metadata
 
 
 class Episode(object):
