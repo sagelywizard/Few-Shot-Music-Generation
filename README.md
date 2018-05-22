@@ -53,7 +53,7 @@ ls Few-Shot-Music-Generation/raw-data/lyrics/
 >> lyrics_data test.csv  train.csv  val.csv
 ```
 
-## Training Models
+### Training Models
 The training script can be run with the following command:
 
 ```
