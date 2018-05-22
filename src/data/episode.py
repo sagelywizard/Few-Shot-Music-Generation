@@ -120,7 +120,7 @@ def load_sampler_from_config(config):
         parallel = False
     elif config['dataset'] == 'midi':
         loader = MIDILoader(config['max_len'])
-        parallel = True
+        parallel = False
     else:
         raise RuntimeError('unknown dataset "%s"' % config['dataset'])
     dataset = Dataset(
