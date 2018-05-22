@@ -55,6 +55,9 @@ for split in config['splits']:
     episode_sampler[split] = load_sampler_from_config(config)
 
 config['input_size'] = episode_sampler['train'].get_num_unique_words()
+if not config['input_size'] > 0:
+    raise RuntimeError(
+        'error reading data: %d unique tokens processed' % config['input_size'])
 print('Num unique words: %d' % config['input_size'])
 
 n_train = config['n_train']
